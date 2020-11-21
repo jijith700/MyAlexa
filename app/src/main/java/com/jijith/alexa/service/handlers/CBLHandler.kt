@@ -1,17 +1,13 @@
 package com.jijith.alexa.service.handlers
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.os.Handler
-import android.os.Looper
-import com.amazon.aace.alexa.AlexaClient
+import android.text.TextUtils
 import com.amazon.aace.cbl.CBL
-import com.jijith.alexa.R
-import com.jijith.alexa.service.interfaces.AuthStateObserver
 import com.jijith.alexa.service.interfaces.managers.AlexaEngineManager
 import com.jijith.alexa.service.interfaces.managers.DatabaseManager
 import com.jijith.alexa.utils.USER_CODE
 import com.jijith.alexa.utils.VERIFICATION_URI
+import com.jijith.alexa.vo.ServiceData
 import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
@@ -26,6 +22,7 @@ class CBLHandler(
 
     init {
         refreshToken = databaseManager.getRefreshToken()
+        ServiceData.isSignedIn.value = !TextUtils.isEmpty(refreshToken)
     }
 
     override fun cblStateChanged(

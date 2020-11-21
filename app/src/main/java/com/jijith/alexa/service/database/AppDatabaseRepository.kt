@@ -1,8 +1,10 @@
 package com.jijith.alexa.service.database
 
-import com.jijith.alexa.utils.EMPTY_STRING
 import com.jijith.alexa.vo.User
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class AppDatabaseRepository(private val userDao: UserDao) {
@@ -15,17 +17,8 @@ class AppDatabaseRepository(private val userDao: UserDao) {
         }
     }
 
-    fun getRefreshToken() : String {
-        var refreshToken = EMPTY_STRING
-        GlobalScope.launch (Dispatchers.Main) {
-            refreshToken = userDao.getRefreshToken(1)
-            Timber.d("refresh token: %s", refreshToken);
-        }
-        /*return GlobalScope.async(Dispatchers.IO) {
-            refreshToken = userDao.getRefreshToken(1)
-            refreshToken
-        }*/
-        return refreshToken
+    fun getRefreshToken() = runBlocking {
+        userDao.getRefreshToken(1)
     }
 
     fun clearRefreshToken() {

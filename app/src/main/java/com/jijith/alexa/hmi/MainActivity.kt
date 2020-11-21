@@ -1,13 +1,10 @@
 package com.jijith.alexa.hmi
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,12 +14,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.jijith.alexa.R
 import com.jijith.alexa.databinding.ActivityMainBinding
+import com.jijith.alexa.hmi.home.HomeFragment
 import com.jijith.alexa.hmi.registration.RegistrationFragment
 import com.jijith.alexa.hmi.splash.SplashFragment
-import com.jijith.alexa.lib.IMyAlexaServiceInterface
 import com.jijith.alexa.service.managersimpl.AlexaEngineManagerImpl
-import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -36,9 +31,6 @@ class MainActivity : AppCompatActivity() {
     )
 
     private lateinit var binding: ActivityMainBinding
-
-
-    lateinit var alexaEngineManager: AlexaEngineManagerImpl
 
     /**
      * Initializing the view model fo the current activity.
@@ -57,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_main)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -80,16 +73,24 @@ class MainActivity : AppCompatActivity() {
                 requests.toTypedArray(), PERMISSION_REQUEST_CODE
             )
         } else {
-            supportFragmentManager.beginTransaction().add(R.id.flContainer, SplashFragment())
+            supportFragmentManager.beginTransaction().replace(R.id.flContainer, SplashFragment())
                 .disallowAddToBackStack()
                 .commitAllowingStateLoss()
-            Handler().postDelayed({
-                supportFragmentManager.beginTransaction().replace(R.id.flContainer, RegistrationFragment())
-                    .addToBackStack(RegistrationFragment::javaClass.name)
-                    .commitAllowingStateLoss()
-            }, 5000)
         }
-//        alexaEngineManager = AlexaEngineManagerImpl(this)
+
+        viewModel.loadRegistration.observe(this, androidx.lifecycle.Observer {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.flContainer, RegistrationFragment())
+                .addToBackStack(RegistrationFragment::javaClass.name)
+                .commitAllowingStateLoss()
+        })
+
+        viewModel.loadHome.observe(this, androidx.lifecycle.Observer {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.flContainer, HomeFragment())
+                .addToBackStack(HomeFragment::javaClass.name)
+                .commitAllowingStateLoss()
+        })
     }
 
     override fun onRequestPermissionsResult(
@@ -115,7 +116,8 @@ class MainActivity : AppCompatActivity() {
                     .disallowAddToBackStack()
                     .commitAllowingStateLoss()
                 Handler().postDelayed({
-                    supportFragmentManager.beginTransaction().replace(R.id.flContainer, RegistrationFragment())
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.flContainer, RegistrationFragment())
                         .addToBackStack(RegistrationFragment::javaClass.name)
                         .commitAllowingStateLoss()
                 }, 5000)

@@ -13,8 +13,9 @@ class MainViewModel() : ViewModel() {
     var loadingVisibility: MutableLiveData<Int> = MutableLiveData()
     var errorMessage: MutableLiveData<String> = MutableLiveData()
     var success: MutableLiveData<Boolean> = MutableLiveData()
-
     var user = MutableLiveData<User>()
+    var loadRegistration: MutableLiveData<Boolean> = MutableLiveData()
+    var loadHome: MutableLiveData<Boolean> = MutableLiveData()
 
     constructor(context: Context, mainRepository: MainRepository) : this() {
         this.context = context
@@ -31,5 +32,13 @@ class MainViewModel() : ViewModel() {
 
     fun startCBL() {
         mainRepository.startCBL()
+    }
+
+    fun loadRegistration() {
+        loadRegistration.value = true
+    }
+
+    fun loadHome() {
+        loadHome.value = true
     }
 }
