@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="My Alexa!"
+            android:text="Welcome to Alexa!"
             android:textColor="@color/colorPrimaryBlue"
             android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"

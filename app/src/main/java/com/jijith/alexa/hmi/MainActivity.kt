@@ -18,6 +18,7 @@ import com.jijith.alexa.hmi.home.HomeFragment
 import com.jijith.alexa.hmi.registration.RegistrationFragment
 import com.jijith.alexa.hmi.splash.SplashFragment
 import com.jijith.alexa.service.managersimpl.AlexaEngineManagerImpl
+import timber.log.Timber
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -73,21 +74,31 @@ class MainActivity : AppCompatActivity() {
                 requests.toTypedArray(), PERMISSION_REQUEST_CODE
             )
         } else {
-            supportFragmentManager.beginTransaction().replace(R.id.flContainer, SplashFragment())
-                .disallowAddToBackStack()
-                .commitAllowingStateLoss()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.flContainer, SplashFragment(), SplashFragment::class.java.simpleName)
+                .addToBackStack(SplashFragment::class.java.simpleName)
+                .commit()
         }
 
         viewModel.loadRegistration.observe(this, androidx.lifecycle.Observer {
+            Timber.d("backstack %d", supportFragmentManager.backStackEntryCount)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.flContainer, RegistrationFragment())
+                .replace(
+                    R.id.flContainer,
+                    RegistrationFragment(),
+                    RegistrationFragment::class.java.simpleName
+                )
                 .addToBackStack(RegistrationFragment::javaClass.name)
                 .commitAllowingStateLoss()
         })
 
         viewModel.loadHome.observe(this, androidx.lifecycle.Observer {
+            Timber.d("backstack %d", supportFragmentManager.backStackEntryCount)
+            val splashFragment =
+                supportFragmentManager.findFragmentByTag(SplashFragment::class.java.simpleName)
+            supportFragmentManager.popBackStack()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.flContainer, HomeFragment())
+                .add(R.id.flContainer, HomeFragment(), HomeFragment::class.java.simpleName)
                 .addToBackStack(HomeFragment::javaClass.name)
                 .commitAllowingStateLoss()
         })
@@ -112,15 +123,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 // Permissions have been granted. Start app
-                supportFragmentManager.beginTransaction().add(R.id.flContainer, SplashFragment())
-                    .disallowAddToBackStack()
-                    .commitAllowingStateLoss()
-                Handler().postDelayed({
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.flContainer, RegistrationFragment())
-                        .addToBackStack(RegistrationFragment::javaClass.name)
-                        .commitAllowingStateLoss()
-                }, 5000)
+                supportFragmentManager.beginTransaction().replace(R.id.flContainer, SplashFragment())
+                    .commit()
             } else {
                 // Permission request was denied
                 Toast.makeText(this, "Permissions required", Toast.LENGTH_LONG).show()
@@ -131,5 +135,13 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         viewModel.stopBinding()
         super.onStop()
+    }
+
+    override fun onBackPressed() {
+        Timber.d("onBackPressed %d", supportFragmentManager.backStackEntryCount)
+        if (supportFragmentManager.backStackEntryCount == 1) {
+            finish()
+        }
+        super.onBackPressed()
     }
 }

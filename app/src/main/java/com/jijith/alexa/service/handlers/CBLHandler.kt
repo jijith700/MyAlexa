@@ -89,6 +89,7 @@ class CBLHandler(
     override fun setRefreshToken(refreshToken: String?) {
         this.refreshToken = refreshToken!!
         databaseManager.setRefreshToken(refreshToken)
+        ServiceData.isSignedIn.value = !TextUtils.isEmpty(refreshToken)
     }
 
     override fun getRefreshToken(): String? {

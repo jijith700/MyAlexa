@@ -8,15 +8,22 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 
 import com.jijith.alexa.R
+import com.jijith.alexa.base.BaseFragment
 import com.jijith.alexa.hmi.MainViewModel
+import com.jijith.alexa.hmi.splash.SplashFragment
 import kotlinx.android.synthetic.main.fragment_registration.*
+import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass.
  */
-class RegistrationFragment : Fragment() {
+class RegistrationFragment : BaseFragment() {
 
     private val sharedMainViewModel: MainViewModel by activityViewModels()
+
+    init {
+        super.setName(RegistrationFragment::class.java.simpleName)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +34,7 @@ class RegistrationFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         btnStart.setOnClickListener{
             sharedMainViewModel.startCBL()

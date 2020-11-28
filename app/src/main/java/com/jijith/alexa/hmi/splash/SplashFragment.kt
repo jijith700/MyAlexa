@@ -13,13 +13,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.jijith.alexa.R
+import com.jijith.alexa.base.BaseFragment
 import com.jijith.alexa.databinding.FragmentSplashBinding
 import com.jijith.alexa.hmi.MainViewModel
+import timber.log.Timber
 
 /**
  * A simple [Fragment] subclass.
  */
-class SplashFragment : Fragment() {
+class SplashFragment : BaseFragment() {
 
     private lateinit var binding: FragmentSplashBinding
 
@@ -38,6 +40,10 @@ class SplashFragment : Fragment() {
                 ) as T
             }
         }
+    }
+
+    init {
+        super.setName(SplashFragment::class.java.simpleName)
     }
 
     override fun onCreateView(
@@ -63,4 +69,5 @@ class SplashFragment : Fragment() {
             viewModel.isSigned()
         }, 5000)
     }
+
 }
