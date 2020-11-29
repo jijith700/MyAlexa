@@ -12,4 +12,6 @@ interface IMyAlexaServiceInterface {
     void unregisterCallback(IMyAlexaCallbackInterface iMyAlexaCallbackInterface);
 
     void startCBL();
+
+    void stopCBL();
 }

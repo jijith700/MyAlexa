@@ -6,4 +6,6 @@ interface AlexaEngineManager {
 
     fun onReceiveCBLCode(url: String?, code: String?)
 
+    fun stopCBL()
+
 }

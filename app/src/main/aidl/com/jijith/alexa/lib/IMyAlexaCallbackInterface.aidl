@@ -5,6 +5,6 @@ package com.jijith.alexa.lib;
 
 interface IMyAlexaCallbackInterface {
 
-    void change();
+    void onReceiveCBL(String url, String code);
 
 }

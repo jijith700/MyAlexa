@@ -82,8 +82,9 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.loadRegistration.observe(this, androidx.lifecycle.Observer {
             Timber.d("backstack %d", supportFragmentManager.backStackEntryCount)
+            supportFragmentManager.popBackStack()
             supportFragmentManager.beginTransaction()
-                .replace(
+                .add(
                     R.id.flContainer,
                     RegistrationFragment(),
                     RegistrationFragment::class.java.simpleName
@@ -94,8 +95,6 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.loadHome.observe(this, androidx.lifecycle.Observer {
             Timber.d("backstack %d", supportFragmentManager.backStackEntryCount)
-            val splashFragment =
-                supportFragmentManager.findFragmentByTag(SplashFragment::class.java.simpleName)
             supportFragmentManager.popBackStack()
             supportFragmentManager.beginTransaction()
                 .add(R.id.flContainer, HomeFragment(), HomeFragment::class.java.simpleName)
@@ -123,7 +122,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 // Permissions have been granted. Start app
-                supportFragmentManager.beginTransaction().replace(R.id.flContainer, SplashFragment())
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.flContainer, SplashFragment())
                     .commit()
             } else {
                 // Permission request was denied

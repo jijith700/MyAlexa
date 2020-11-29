@@ -69,5 +69,4 @@ class SplashFragment : BaseFragment() {
             viewModel.isSigned()
         }, 5000)
     }
-
 }

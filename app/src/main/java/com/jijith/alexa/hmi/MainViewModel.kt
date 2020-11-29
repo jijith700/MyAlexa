@@ -16,6 +16,8 @@ class MainViewModel() : ViewModel() {
     var user = MutableLiveData<User>()
     var loadRegistration: MutableLiveData<Boolean> = MutableLiveData()
     var loadHome: MutableLiveData<Boolean> = MutableLiveData()
+    var url = MutableLiveData<String>()
+    var code = MutableLiveData<String>()
 
     constructor(context: Context, mainRepository: MainRepository) : this() {
         this.context = context
@@ -24,6 +26,8 @@ class MainViewModel() : ViewModel() {
         loadingVisibility = mainRepository.loading
         errorMessage = mainRepository.errrorMessage
         success = mainRepository.success
+        url = mainRepository.url
+        code = mainRepository.code
     }
 
     fun stopBinding() {
@@ -40,5 +44,9 @@ class MainViewModel() : ViewModel() {
 
     fun loadHome() {
         loadHome.value = true
+    }
+
+    fun stopCBL(){
+        mainRepository.stopCBL()
     }
 }

@@ -3,29 +3,31 @@ package com.jijith.alexa.hmi.registration
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.jijith.alexa.hmi.MainViewModel
 import com.jijith.alexa.vo.User
 
-class RegistrationViewModel() : ViewModel() {
+class RegistrationViewModel(
+    private val context: Context?,
+    private val registrationRepository: RegistrationRepository,
+    sharedMainViewModel: MainViewModel
+) : ViewModel() {
 
-    private lateinit var context: Context
-    private lateinit var mainRepository: RegistrationRepository
 
     var loadingVisibility: MutableLiveData<Int> = MutableLiveData()
     var errorMessage: MutableLiveData<String> = MutableLiveData()
     var success: MutableLiveData<Boolean> = MutableLiveData()
+    var isSignedIn = MutableLiveData<Boolean>()
 
     var user = MutableLiveData<User>()
 
-    constructor(context: Context, mainRepository: RegistrationRepository) : this() {
-        this.context = context
-        this.mainRepository = mainRepository
-        user = mainRepository.user
-        loadingVisibility = mainRepository.loading
-        errorMessage = mainRepository.errrorMessage
-        success = mainRepository.success
+    init {
+        user = registrationRepository.user
+        loadingVisibility = registrationRepository.loading
+        errorMessage = registrationRepository.errrorMessage
+        isSignedIn = registrationRepository.isSignedIn
     }
 
-    fun startCBL() {
-        mainRepository.startCBL()
+    fun isSigned() {
+        registrationRepository.isSignedIn()
     }
 }

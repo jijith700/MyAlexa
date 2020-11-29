@@ -19,6 +19,7 @@ import com.amazon.sampleapp.core.FileUtils
 import com.jijith.alexa.service.handlers.*
 import com.jijith.alexa.service.handlers.carcontrol.CarControlDataProvider
 import com.jijith.alexa.service.handlers.carcontrol.CarControlHandler
+import com.jijith.alexa.service.interfaces.AlexaServiceCallbackListener
 import com.jijith.alexa.service.interfaces.managers.AlexaEngineManager
 import com.jijith.alexa.service.interfaces.managers.DatabaseManager
 import com.jijith.alexa.service.interfaces.managers.NetworkManager
@@ -28,7 +29,10 @@ import timber.log.Timber
 import java.io.File
 import java.util.*
 
-class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager {
+class AlexaEngineManagerImpl(
+    private var context: Context,
+    private var alexaServiceCallbackListener: AlexaServiceCallbackListener
+) : AlexaEngineManager {
 
     // Core
     private lateinit var mEngine: Engine
@@ -161,7 +165,8 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
             throw RuntimeException("Could not register SpeechRecognizer platform interface")
 
         // AudioPlayer
-        audioPlayerHandler = AudioPlayerHandler(audioOutputProviderHandler, playbackControllerHandler)
+        audioPlayerHandler =
+            AudioPlayerHandler(audioOutputProviderHandler, playbackControllerHandler)
         if (!mEngine.registerPlatformInterface(audioPlayerHandler))
             throw RuntimeException("Could not register AudioPlayer platform interface")
 
@@ -202,7 +207,7 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
             throw RuntimeException("Could not register Notifications platform interface")
 
         // LVC Handlers
-        if (!mEngine.registerPlatformInterface(CarControlHandler(context )))
+        if (!mEngine.registerPlatformInterface(CarControlHandler(context)))
             throw RuntimeException("Could not register Car Control platform interface")
 
         // Set Output Audio provider now that it is registered
@@ -437,7 +442,7 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
                 try {
                     // set Android ID as product DSN
                     productDsn = Settings.Secure.getString(
-                        context?.getContentResolver(),
+                        context?.contentResolver,
                         Settings.Secure.ANDROID_ID
                     )
                     Timber.i("android id for DSN: $productDsn")
@@ -498,7 +503,7 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
                         EqualizerConfiguration.getMaxBandLevel(),
                         EqualizerConfiguration.getDefaultBandLevels()
                     ), */ // Uncomment the below line to specify the template runtime values
-                    AlexaConfiguration.createTemplateRuntimeTimeoutConfig( timeoutList ),
+                    AlexaConfiguration.createTemplateRuntimeTimeoutConfig(timeoutList),
                     StorageConfiguration.createLocalStorageConfig(appDataDir.path + "/localStorage.sqlite"),  // Example Vehicle Config
                     VehicleConfiguration.createVehicleInfoConfig(
                         arrayOf(
@@ -555,7 +560,7 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
                     carControlConfiguration
                 )
             )
-        
+
         return configuration
     }
 
@@ -568,14 +573,15 @@ class AlexaEngineManagerImpl(private var context: Context) : AlexaEngineManager 
     }
 
     override fun startCBL() {
-        if (cblHandler != null) {
-            cblHandler.startCBL()
-        } else {
-            Timber.d("error")
-        }
+        cblHandler?.startCBL()
     }
 
     override fun onReceiveCBLCode(url: String?, code: String?) {
         Timber.d("URL: %s Code: %s", url, code)
+        alexaServiceCallbackListener?.onReceiveCBL(url, code)
+    }
+
+    override fun stopCBL() {
+        cblHandler?.stopCBL()
     }
 }

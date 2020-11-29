@@ -15,12 +15,13 @@ import androidx.core.app.NotificationCompat
 import com.jijith.alexa.R
 import com.jijith.alexa.lib.IMyAlexaCallbackInterface
 import com.jijith.alexa.lib.IMyAlexaServiceInterface
+import com.jijith.alexa.service.interfaces.AlexaServiceCallbackListener
 import com.jijith.alexa.service.interfaces.managers.AlexaEngineManager
 import com.jijith.alexa.service.managersimpl.AlexaEngineManagerImpl
 import timber.log.Timber
 import java.util.*
 
-class AlexaService : Service() {
+class AlexaService : Service(), AlexaServiceCallbackListener {
 
     // Binder given to clients
     private val binder = LocalBinder()
@@ -41,12 +42,12 @@ class AlexaService : Service() {
         fun getService(): AlexaService = this@AlexaService
     }
 
-    private lateinit var alexaEngineManager : AlexaEngineManager
+    private lateinit var alexaEngineManager: AlexaEngineManager
 
 
     override fun onCreate() {
         super.onCreate()
-        alexaEngineManager = AlexaEngineManagerImpl(baseContext)
+        alexaEngineManager = AlexaEngineManagerImpl(baseContext, this)
     }
 
     override fun onBind(intent: Intent): IBinder {
@@ -93,19 +94,33 @@ class AlexaService : Service() {
 
     private var iMyAlexaServiceInterfaceBinder = object : IMyAlexaServiceInterface.Stub() {
 
-            override fun registerCallback(iMyAlexaCallbackInterface: IMyAlexaCallbackInterface?) {
-                this@AlexaService.iMyAlexaCallbackInterface.register(iMyAlexaCallbackInterface)
-            }
+        override fun registerCallback(iMyAlexaCallbackInterface: IMyAlexaCallbackInterface?) {
+            this@AlexaService.iMyAlexaCallbackInterface.register(iMyAlexaCallbackInterface)
+        }
 
         override fun startCBL() {
             Timber.d("startCBL")
             alexaEngineManager.startCBL()
         }
 
+        override fun stopCBL() {
+            Timber.d("stopCBL")
+            alexaEngineManager.stopCBL()
+        }
+
         override fun unregisterCallback(iMyAlexaCallbackInterface: IMyAlexaCallbackInterface?) {
-                synchronized(this@AlexaService) {
-                    this@AlexaService.iMyAlexaCallbackInterface.unregister(iMyAlexaCallbackInterface)
-                }
+            synchronized(this@AlexaService) {
+                this@AlexaService.iMyAlexaCallbackInterface.finishBroadcast()
+                this@AlexaService.iMyAlexaCallbackInterface.unregister(iMyAlexaCallbackInterface)
             }
         }
+    }
+
+    override fun onReceiveCBL(url: String?, code: String?) {
+        iMyAlexaCallbackInterface.beginBroadcast()
+        for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount) {
+            iMyAlexaCallbackInterface.getBroadcastItem(i).onReceiveCBL(url, code)
+        }
+        iMyAlexaCallbackInterface.finishBroadcast()
+    }
 }

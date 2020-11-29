@@ -89,7 +89,7 @@ class CBLHandler(
     override fun setRefreshToken(refreshToken: String?) {
         this.refreshToken = refreshToken!!
         databaseManager.setRefreshToken(refreshToken)
-        ServiceData.isSignedIn.value = !TextUtils.isEmpty(refreshToken)
+        ServiceData.isSignedIn.postValue(!TextUtils.isEmpty(refreshToken))
     }
 
     override fun getRefreshToken(): String? {
@@ -100,5 +100,10 @@ class CBLHandler(
     fun startCBL() {
         Timber.d("startCBL")
         start()
+    }
+
+    fun stopCBL() {
+        Timber.d("stopCBL")
+        cancel()
     }
 }

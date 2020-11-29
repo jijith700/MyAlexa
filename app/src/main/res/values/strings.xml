@@ -12,4 +12,10 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--RegistrationFragment-->
+    <string name="btn_login">Login with Amazon</string>
+    <string name="tv_txt_login">By login you can use the Amazon Alexa</string>
+    <string name="tv_txt_url">Goto the url %1$s \nand enter the below code</string>
+
 </resources>

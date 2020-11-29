@@ -8,12 +8,13 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.jijith.alexa.R
+import com.jijith.alexa.lib.IMyAlexaCallbackInterface
 import com.jijith.alexa.lib.IMyAlexaServiceInterface
 import com.jijith.alexa.vo.User
 import timber.log.Timber
 
 
-class MainRepository(var context: Context) {
+class MainRepository(var context: Context) : IMyAlexaCallbackInterface{
 
     private lateinit var iMyAlexaServiceInterface: IMyAlexaServiceInterface
 
@@ -21,6 +22,9 @@ class MainRepository(var context: Context) {
     var success = MutableLiveData<Boolean>()
     var errrorMessage = MutableLiveData<String>()
     var user = MutableLiveData<User>()
+    var url = MutableLiveData<String>()
+    var code = MutableLiveData<String>()
+
 
     lateinit var serviceConnection : ServiceConnection
 
@@ -65,7 +69,9 @@ class MainRepository(var context: Context) {
 
 
     fun stopBinding() {
+        iMyAlexaServiceInterface.unregisterCallback(this)
         context.unbindService(serviceConnection)
+
     }
 
     /**
@@ -82,6 +88,7 @@ class MainRepository(var context: Context) {
         ) {
             if (serviceName == IMyAlexaServiceInterface::class.java.name) {
                 iMyAlexaServiceInterface = IMyAlexaServiceInterface.Stub.asInterface(boundService)
+                iMyAlexaServiceInterface.registerCallback(this@MainRepository)
             }
             Toast
                 .makeText(
@@ -107,5 +114,19 @@ class MainRepository(var context: Context) {
         } else {
             Timber.d("error")
         }
+    }
+
+    override fun asBinder(): IBinder {
+       return iMyAlexaServiceInterface.asBinder()
+    }
+
+    override fun onReceiveCBL(url: String?, code: String?) {
+        Timber.d("URL: %s Code: %s", url, code)
+        this.url.postValue(url!!)
+        this.code.postValue(code!!)
+    }
+
+    fun stopCBL() {
+        iMyAlexaServiceInterface?.stopCBL()
     }
 }
