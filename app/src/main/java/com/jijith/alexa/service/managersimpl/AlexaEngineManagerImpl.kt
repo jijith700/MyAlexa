@@ -1,7 +1,6 @@
 package com.jijith.alexa.service.managersimpl
 
 import android.content.Context
-import android.os.Environment
 import android.provider.Settings
 import com.amazon.aace.alexa.AlexaProperties
 import com.amazon.aace.alexa.config.AlexaConfiguration
@@ -10,14 +9,12 @@ import com.amazon.aace.carControl.CarControlAssets
 import com.amazon.aace.carControl.CarControlConfiguration
 import com.amazon.aace.core.CoreProperties
 import com.amazon.aace.core.Engine
-import com.amazon.aace.core.config.ConfigurationFile
 import com.amazon.aace.core.config.EngineConfiguration
 import com.amazon.aace.storage.config.StorageConfiguration
 import com.amazon.aace.vehicle.config.VehicleConfiguration
 import com.amazon.aace.vehicle.config.VehicleConfiguration.VehicleProperty
 import com.amazon.sampleapp.core.FileUtils
 import com.jijith.alexa.service.handlers.*
-import com.jijith.alexa.service.handlers.carcontrol.CarControlDataProvider
 import com.jijith.alexa.service.handlers.carcontrol.CarControlHandler
 import com.jijith.alexa.service.interfaces.AlexaServiceCallbackListener
 import com.jijith.alexa.service.interfaces.managers.AlexaEngineManager
@@ -176,7 +173,7 @@ class AlexaEngineManagerImpl(
             throw RuntimeException("Could not register SpeechSynthesizer platform interface")
 
         // TemplateRuntime
-        templateRuntimeHandler = TemplateRuntimeHandler(playbackControllerHandler)
+        templateRuntimeHandler = TemplateRuntimeHandler(this, playbackControllerHandler)
         if (!mEngine.registerPlatformInterface(templateRuntimeHandler))
             throw RuntimeException("Could not register TemplateRuntime platform interface")
 
@@ -583,5 +580,9 @@ class AlexaEngineManagerImpl(
 
     override fun stopCBL() {
         cblHandler?.stopCBL()
+    }
+
+    override fun onRenderTemplate(payload: String?) {
+        alexaServiceCallbackListener?.onRenderTemplate(payload)
     }
 }

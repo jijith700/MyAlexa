@@ -9,6 +9,7 @@ const val CONFIG = "config"
 
 const val CLIENT_ID = "clientId"
 const val PRODUCT_ID = "productId"
+const val DISPLAY_CARD = "displayCard"
 
 const val EMPTY_STRING = ""
 const val TRUE = true

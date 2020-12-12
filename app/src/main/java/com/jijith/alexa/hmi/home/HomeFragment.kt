@@ -7,13 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
-import android.view.animation.Animation.AnimationListener
-import android.view.animation.AnimationUtils
-import android.view.animation.DecelerateInterpolator
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.amazon.autovoicechrome.AutoVoiceChromeController
@@ -22,6 +20,7 @@ import com.jijith.alexa.R
 import com.jijith.alexa.base.BaseFragment
 import com.jijith.alexa.databinding.FragmentHomeBinding
 import com.jijith.alexa.hmi.MainViewModel
+import com.jijith.alexa.hmi.displaycard.WikiFragment
 import timber.log.Timber
 
 /**
@@ -45,7 +44,7 @@ class HomeFragment : BaseFragment() {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
                 return HomeViewModel(
-                    context,
+                    context, sharedMainViewModel.mainRepository,
                     HomeRepository(context)
                 ) as T
             }
@@ -80,11 +79,19 @@ class HomeFragment : BaseFragment() {
             animateVoiceChromeToBottom()
         })
 
+        viewModel.wikiDisplayCard.observe(viewLifecycleOwner, Observer {
+            animateTextToTop()
+            animateVoiceChromeToBottom()
+            val wikiDisplayCard = WikiFragment.newInstance(it)
+            activity?.supportFragmentManager?.beginTransaction()
+                ?.add(R.id.flContainer, wikiDisplayCard, WikiFragment::class.java.simpleName)
+                ?.addToBackStack(WikiFragment::javaClass.name)
+                ?.commitAllowingStateLoss()
+        })
     }
 
     override fun onResume() {
         super.onResume()
-
     }
 
     override fun onDestroy() {

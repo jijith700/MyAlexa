@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jijith.alexa.vo.User
+import com.jijith.alexa.vo.WikiDisplayCard
 
 class MainViewModel() : ViewModel() {
 
     private lateinit var context: Context
-    private lateinit var mainRepository: MainRepository
+    lateinit var mainRepository: MainRepository
 
     var loadingVisibility: MutableLiveData<Int> = MutableLiveData()
     var errorMessage: MutableLiveData<String> = MutableLiveData()
@@ -18,6 +19,7 @@ class MainViewModel() : ViewModel() {
     var loadHome: MutableLiveData<Boolean> = MutableLiveData()
     var url = MutableLiveData<String>()
     var code = MutableLiveData<String>()
+    var wikiDisplayCard = MutableLiveData<WikiDisplayCard>()
 
     constructor(context: Context, mainRepository: MainRepository) : this() {
         this.context = context
@@ -28,6 +30,8 @@ class MainViewModel() : ViewModel() {
         success = mainRepository.success
         url = mainRepository.url
         code = mainRepository.code
+
+
     }
 
     fun stopBinding() {

@@ -8,4 +8,6 @@ interface AlexaEngineManager {
 
     fun stopCBL()
 
+    fun onRenderTemplate(payload:  String?)
+
 }

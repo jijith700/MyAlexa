@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.jijith.alexa.R
 import com.jijith.alexa.databinding.ActivityMainBinding
+import com.jijith.alexa.hmi.displaycard.WikiFragment
 import com.jijith.alexa.hmi.home.HomeFragment
 import com.jijith.alexa.hmi.registration.RegistrationFragment
 import com.jijith.alexa.hmi.splash.SplashFragment
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var homeFragment: HomeFragment
 
     /**
      * Initializing the view model fo the current activity.
@@ -96,9 +98,20 @@ class MainActivity : AppCompatActivity() {
         viewModel.loadHome.observe(this, androidx.lifecycle.Observer {
             Timber.d("backstack %d", supportFragmentManager.backStackEntryCount)
             supportFragmentManager.popBackStack()
+            homeFragment = HomeFragment()
             supportFragmentManager.beginTransaction()
-                .add(R.id.flContainer, HomeFragment(), HomeFragment::class.java.simpleName)
+                .add(R.id.flContainer, homeFragment, HomeFragment::class.java.simpleName)
                 .addToBackStack(HomeFragment::javaClass.name)
+                .commitAllowingStateLoss()
+        })
+
+        viewModel.wikiDisplayCard.observe(this, androidx.lifecycle.Observer {
+            homeFragment?.animateTextToTop()
+            homeFragment?.animateVoiceChromeToBottom()
+            val wikiDisplayCard = WikiFragment.newInstance(it)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.flContainer, wikiDisplayCard, WikiFragment::class.java.simpleName)
+                .addToBackStack(WikiFragment::javaClass.name)
                 .commitAllowingStateLoss()
         })
     }

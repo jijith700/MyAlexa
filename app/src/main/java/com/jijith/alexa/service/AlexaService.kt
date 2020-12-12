@@ -7,10 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import android.os.RemoteCallbackList
+import android.os.*
 import androidx.core.app.NotificationCompat
 import com.jijith.alexa.R
 import com.jijith.alexa.lib.IMyAlexaCallbackInterface
@@ -117,10 +114,28 @@ class AlexaService : Service(), AlexaServiceCallbackListener {
     }
 
     override fun onReceiveCBL(url: String?, code: String?) {
-        iMyAlexaCallbackInterface.beginBroadcast()
-        for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount) {
-            iMyAlexaCallbackInterface.getBroadcastItem(i).onReceiveCBL(url, code)
+        try {
+            iMyAlexaCallbackInterface.beginBroadcast()
+            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount-1) {
+                iMyAlexaCallbackInterface.getBroadcastItem(i).onReceiveCBL(url, code)
+            }
+        } catch (e: RemoteException) {
+            Timber.e(e.message)
+        } finally {
+            iMyAlexaCallbackInterface.finishBroadcast()
         }
-        iMyAlexaCallbackInterface.finishBroadcast()
+    }
+
+    override fun onRenderTemplate(payload: String?) {
+        try {
+            iMyAlexaCallbackInterface.beginBroadcast()
+            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount-1) {
+                iMyAlexaCallbackInterface.getBroadcastItem(i).onRenderTemplate(payload)
+            }
+        } catch (e: RemoteException) {
+            Timber.e(e.message)
+        } finally {
+            iMyAlexaCallbackInterface.finishBroadcast()
+        }
     }
 }
