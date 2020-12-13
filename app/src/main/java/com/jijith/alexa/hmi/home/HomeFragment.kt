@@ -1,5 +1,6 @@
 package com.jijith.alexa.hmi.home
 
+import android.app.ActionBar
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -15,13 +16,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.amazon.autovoicechrome.AutoVoiceChromeController
-import com.amazon.autovoicechrome.util.AutoVoiceChromeState
 import com.jijith.alexa.R
 import com.jijith.alexa.base.BaseFragment
 import com.jijith.alexa.databinding.FragmentHomeBinding
 import com.jijith.alexa.hmi.MainViewModel
 import com.jijith.alexa.hmi.displaycard.WikiFragment
+import com.jijith.alexa.utils.ResizeAnimation
+import com.jijith.alexa.utils.Utils
 import timber.log.Timber
+
 
 /**
  * A simple [Fragment] subclass.
@@ -68,7 +71,6 @@ class HomeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         autoVoiceChromeController = AutoVoiceChromeController(context?.applicationContext!!)
         autoVoiceChromeController?.initialize(binding.flVoiceChrome)
-        autoVoiceChromeController?.onStateChanged(AutoVoiceChromeState.LISTENING)
 
         animateTextToCenter()
         animateVoiceChromeToCenter()
@@ -83,10 +85,14 @@ class HomeFragment : BaseFragment() {
             animateTextToTop()
             animateVoiceChromeToBottom()
             val wikiDisplayCard = WikiFragment.newInstance(it)
-            activity?.supportFragmentManager?.beginTransaction()
-                ?.add(R.id.flContainer, wikiDisplayCard, WikiFragment::class.java.simpleName)
-                ?.addToBackStack(WikiFragment::javaClass.name)
-                ?.commitAllowingStateLoss()
+            childFragmentManager.beginTransaction()
+                .add(R.id.flContainer, wikiDisplayCard, WikiFragment::class.java.simpleName)
+                .addToBackStack(WikiFragment::javaClass.name)
+                .commitAllowingStateLoss()
+        })
+
+        viewModel.dialogState.observe(viewLifecycleOwner, Observer {
+            autoVoiceChromeController?.onStateChanged(Utils.getAutoVoiceChromeState(it))
         })
     }
 
@@ -143,8 +149,8 @@ class HomeFragment : BaseFragment() {
                 .translationX(10F)
                 .translationY(10F)
                 .setInterpolator(AccelerateInterpolator())
-                .setDuration(1000)
-        }, 1000)
+                .setDuration(500)
+        }, 500)
     }
 
     fun animateVoiceChromeToBottom() {
@@ -153,7 +159,27 @@ class HomeFragment : BaseFragment() {
                 .translationX(0F)
                 .translationY(0F)
                 .setInterpolator(AccelerateInterpolator())
-                .setDuration(1000)
-        }, 1000)
+                .setDuration(500)
+        }, 500)
+    }
+
+    fun collapseContainer() {
+        val resizeAnimation = ResizeAnimation(
+            view,
+            0,
+            100
+        )
+        resizeAnimation.duration = 1000
+        binding.flContainer.startAnimation(resizeAnimation)
+    }
+
+    fun expandContainer() {
+        val resizeAnimation = ResizeAnimation(
+            view,
+            100,
+            0
+        )
+        resizeAnimation.duration = 500
+        binding.flContainer.startAnimation(resizeAnimation)
     }
 }

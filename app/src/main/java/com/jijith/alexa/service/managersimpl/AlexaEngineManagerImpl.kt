@@ -2,6 +2,7 @@ package com.jijith.alexa.service.managersimpl
 
 import android.content.Context
 import android.provider.Settings
+import com.amazon.aace.alexa.AlexaClient
 import com.amazon.aace.alexa.AlexaProperties
 import com.amazon.aace.alexa.config.AlexaConfiguration
 import com.amazon.aace.alexa.config.AlexaConfiguration.TemplateRuntimeTimeout
@@ -127,7 +128,7 @@ class AlexaEngineManagerImpl(
             throw RuntimeException("Could not register Logger platform interface")
 
         // AlexaClient
-        alexaClientHandler = AlexaClientHandler(context)
+        alexaClientHandler = AlexaClientHandler(this, context)
         if (!mEngine.registerPlatformInterface(alexaClientHandler))
             throw RuntimeException("Could not register AlexaClient platform interface")
 
@@ -584,5 +585,9 @@ class AlexaEngineManagerImpl(
 
     override fun onRenderTemplate(payload: String?) {
         alexaServiceCallbackListener?.onRenderTemplate(payload)
+    }
+
+    override fun onDialogStateChange(dialogState: AlexaClient.DialogState?) {
+        alexaServiceCallbackListener.onDialoStateChange(dialogState)
     }
 }

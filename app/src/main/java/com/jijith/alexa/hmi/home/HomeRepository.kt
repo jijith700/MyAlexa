@@ -2,6 +2,7 @@ package com.jijith.alexa.hmi.home
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import com.amazon.aace.alexa.AlexaClient
 import com.google.gson.Gson
 import com.jijith.alexa.hmi.common.CommonRepository
 import com.jijith.alexa.hmi.interfaces.Repository
@@ -19,6 +20,7 @@ class HomeRepository(var context: Context?) : Repository {
     var errrorMessage = MutableLiveData<String>()
     var user = MutableLiveData<User>()
     var wikiDisplayCard = MutableLiveData<WikiDisplayCard>()
+    var dialogState = MutableLiveData<AlexaClient.DialogState>()
 
     init {
         CommonRepository.registerRepositoryObserver(this)
@@ -54,5 +56,9 @@ class HomeRepository(var context: Context?) : Repository {
 
             else -> Timber.e("Unknown Template sent")
         }
+    }
+
+    override fun onDialogStateChange(dialogState: AlexaClient.DialogState) {
+        this.dialogState.postValue(dialogState)
     }
 }

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.widget.Toast
+import com.amazon.aace.alexa.AlexaClient
+import com.amazon.autovoicechrome.util.AutoVoiceChromeState
 import com.jijith.alexa.R
 import com.jijith.alexa.hmi.MainRepository
 import com.jijith.alexa.hmi.interfaces.Repository
@@ -124,6 +126,13 @@ object CommonRepository : IMyAlexaCallbackInterface {
         Timber.d("payload: %s", payload)
         for (repo in repository!!) {
             repo.onRenderTemplate(payload)
+        }
+    }
+
+    override fun onDialogStateChange(state: String) {
+        Timber.d("state: %s", state)
+        for (repo in repository!!) {
+            repo.onDialogStateChange(AlexaClient.DialogState.valueOf(state))
         }
     }
 

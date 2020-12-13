@@ -3,10 +3,14 @@ package com.jijith.alexa.service.handlers
 import android.content.Context
 import com.amazon.aace.alexa.AlexaClient
 import com.jijith.alexa.service.interfaces.AuthStateObserver
+import com.jijith.alexa.service.interfaces.managers.AlexaEngineManager
 import timber.log.Timber
 import java.util.*
 
-class AlexaClientHandler(private var context: Context) : AlexaClient() {
+class AlexaClientHandler(
+    private var alexaEngineManager: AlexaEngineManager,
+    private var context: Context
+) : AlexaClient() {
 
     // List of Authentication observers
     private var observers = HashSet<AuthStateObserver>()
@@ -35,6 +39,7 @@ class AlexaClientHandler(private var context: Context) : AlexaClient() {
     override fun dialogStateChanged(state: DialogState?) {
         super.dialogStateChanged(state)
         Timber.d("state= %s ", state)
+        alexaEngineManager.onDialogStateChange(state)
     }
 
     fun registerAuthStateObserver(observer: AuthStateObserver?) {

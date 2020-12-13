@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.*
 import androidx.core.app.NotificationCompat
+import com.amazon.aace.alexa.AlexaClient
 import com.jijith.alexa.R
 import com.jijith.alexa.lib.IMyAlexaCallbackInterface
 import com.jijith.alexa.lib.IMyAlexaServiceInterface
@@ -107,7 +108,6 @@ class AlexaService : Service(), AlexaServiceCallbackListener {
 
         override fun unregisterCallback(iMyAlexaCallbackInterface: IMyAlexaCallbackInterface?) {
             synchronized(this@AlexaService) {
-                this@AlexaService.iMyAlexaCallbackInterface.finishBroadcast()
                 this@AlexaService.iMyAlexaCallbackInterface.unregister(iMyAlexaCallbackInterface)
             }
         }
@@ -116,7 +116,7 @@ class AlexaService : Service(), AlexaServiceCallbackListener {
     override fun onReceiveCBL(url: String?, code: String?) {
         try {
             iMyAlexaCallbackInterface.beginBroadcast()
-            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount-1) {
+            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount - 1) {
                 iMyAlexaCallbackInterface.getBroadcastItem(i).onReceiveCBL(url, code)
             }
         } catch (e: RemoteException) {
@@ -129,8 +129,21 @@ class AlexaService : Service(), AlexaServiceCallbackListener {
     override fun onRenderTemplate(payload: String?) {
         try {
             iMyAlexaCallbackInterface.beginBroadcast()
-            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount-1) {
+            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount - 1) {
                 iMyAlexaCallbackInterface.getBroadcastItem(i).onRenderTemplate(payload)
+            }
+        } catch (e: RemoteException) {
+            Timber.e(e.message)
+        } finally {
+            iMyAlexaCallbackInterface.finishBroadcast()
+        }
+    }
+
+    override fun onDialoStateChange(dialogState: AlexaClient.DialogState?) {
+        try {
+            iMyAlexaCallbackInterface.beginBroadcast()
+            for (i in 0..iMyAlexaCallbackInterface.registeredCallbackCount - 1) {
+                iMyAlexaCallbackInterface.getBroadcastItem(i).onDialogStateChange(dialogState?.name)
             }
         } catch (e: RemoteException) {
             Timber.e(e.message)

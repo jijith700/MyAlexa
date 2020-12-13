@@ -9,4 +9,6 @@ interface IMyAlexaCallbackInterface {
 
     void onRenderTemplate(String payload);
 
+    void onDialogStateChange(String state);
+
 }

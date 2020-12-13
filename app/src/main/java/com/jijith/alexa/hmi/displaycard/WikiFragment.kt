@@ -9,6 +9,7 @@ import com.jijith.alexa.R
 import com.jijith.alexa.base.BaseFragment
 import com.jijith.alexa.utils.DISPLAY_CARD
 import com.jijith.alexa.vo.WikiDisplayCard
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_wiki.*
 
 
@@ -58,6 +59,10 @@ class WikiFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tvWikiText.text = wikiDisplayCard?.textField
+        tvWikiTitle.text = wikiDisplayCard?.title?.mainTitle
+        tvWikiDescription.text = wikiDisplayCard?.textField
+        Picasso.get()
+            .load(wikiDisplayCard?.image?.sources?.get(0)?.url)
+            .into(ivWikiImage)
     }
 }
